@@ -21,7 +21,6 @@
  */
 
 use local_s3coursedelete\form\awscreds;
-use local_s3coursedelete\manager;
 
 global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 require_once(__DIR__ . '/../../config.php');
@@ -29,9 +28,6 @@ require_once($CFG->dirroot . '/local/s3coursedelete/lib.php');
 
 require_login();
 $context = context_system::instance();
-
-//$newsid = optional_param('newsid', 0, PARAM_INT);
-//$delete = optional_param('del', 0, PARAM_INT);
 
 $PAGE->set_url(new moodle_url('/local/s3coursedelete/awscreds.php'));
 $PAGE->set_context(\context_system::instance());
