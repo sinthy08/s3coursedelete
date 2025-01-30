@@ -28,3 +28,6 @@ $plugin->version   = 2023020317;       // The current module version (Date: YYYY
 $plugin->requires  = 2021051100;    // Requires this Moodle version.
 $plugin->component = 'local_s3coursedelete';       // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;
+$plugin->dependencies = array(
+    'local_aws' => 2022011300
+);

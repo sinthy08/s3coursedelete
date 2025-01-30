@@ -23,59 +23,17 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-/**
- * Given an array with a file path, it returns the itemid and the filepath for the defined filearea.
- *
- * @param  string $filearea The filearea.
- * @param  array  $args The path (the part after the filearea and before the filename).
- * @return array The itemid and the filepath inside the $args path, for the defined filearea.
- */
-function local_s3coursedelete_get_path_from_pluginfile(string $filearea, array $args) : array {
-    // s3coursedelete never has an itemid (the number represents the revision but it's not stored in database).
-    array_shift($args);
-
-    // Get the filepath.
-    if (empty($args)) {
-        $filepath = '/';
-    } else {
-        $filepath = '/' . implode('/', $args) . '/';
-    }
-
-    return [
-        'itemid' => 0,
-        'filepath' => $filepath,
-    ];
+function encryptData($data, $password) {
+    $key = hash('sha256', $password, true); // Ensure a 32-byte key
+    $iv = openssl_random_pseudo_bytes(16); // Generate a random IV
+    $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
+    return base64_encode($iv . $encrypted); // Store IV + encrypted data
 }
 
-
-/**
- * Serve the files.
- *
- * @param stdClass $course the course object
- * @param stdClass $cm the course module object
- * @param context $context the context
- * @param string $filearea the name of the file area
- * @param array $args extra arguments (itemid, path)
- * @param bool $forcedownload whether or not force download
- * @param array $options additional options affecting the file serving
- *
- * @return bool false if the file not found, just send the file otherwise and do not return anything
- */
-function local_s3coursedelete_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    $itemid = array_shift($args);
-    $filename = array_pop($args);
-
-    if (!$args) {
-        $filepath = '/';
-    } else {
-        $filepath = '/' . implode('/', $args) . '/';
-    }
-
-    $fs = get_file_storage();
-
-    $file = $fs->get_file($context->id, 'local_s3coursedelete', $filearea, $itemid, $filepath, $filename);
-    if (!$file) {
-        return false;
-    }
-    send_stored_file($file, 0, 0, $forcedownload, $options);
+function decryptData($encryptedData, $password) {
+    $key = hash('sha256', $password, true); // Ensure a 32-byte key
+    $data = base64_decode($encryptedData);
+    $iv = substr($data, 0, 16); // Extract IV
+    $encrypted = substr($data, 16); // Extract encrypted data
+    return openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
 }

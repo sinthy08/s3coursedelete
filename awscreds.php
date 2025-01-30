@@ -30,69 +30,51 @@ require_once($CFG->dirroot . '/local/s3coursedelete/lib.php');
 require_login();
 $context = context_system::instance();
 
-$newsid = optional_param('newsid', 0, PARAM_INT);
-$delete = optional_param('del', 0, PARAM_INT);
+//$newsid = optional_param('newsid', 0, PARAM_INT);
+//$delete = optional_param('del', 0, PARAM_INT);
 
 $PAGE->set_url(new moodle_url('/local/s3coursedelete/awscreds.php'));
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title('Newsfeed Edit');
 
 
-//$mform = new awscreds($CFG->wwwroot . '/local/s3coursedelete/awscreds.php');
 $mform = new awscreds($CFG->wwwroot . '/local/s3coursedelete/awscreds.php');
-//
-//if ($mform->is_cancelled()) {
-//    // Go back to awscredsmanage.php page
-//    redirect($CFG->wwwroot . '/local/s3coursedelete/awscredsmanage.php', get_string('cancelled_form', 'local_s3coursedelete'));
-//
-//} else if ($fromform = $mform->get_data()) {
+
+if ($mform->is_cancelled()) {
+    // Go back to newsdetailsmanage.php page
+    redirect($CFG->wwwroot . '/admin/search.php#linkmodules', get_string('cancelled_form', 'local_s3coursedelete'));
+
+} else if ($fromform = $mform->get_data()) {
 
     $fromform = $mform->get_data();
-    var_dump($fromform); die;
-    $manager = new manager();
 
-//    if ($newsid != NULL) {
-//        // We are updating an existing message.
-//        global $DB;
-//        $object = new stdClass();
-//        $object->id = $newsid;
-//        $object->newsimage = $fromform->newsimage;
-//
-//
-//        $DB->update_record('s3coursedelete_awscreds', $object);
-//        update_record_s3coursedelete_newsdetailurl($fromform, $newsid);
-//        redirect($CFG->wwwroot . '/local/s3coursedelete/awscredsmanage.php', get_string('updated_form', 'local_s3coursedelete'));
-//    }
-//
-//    // Insert.
-//    $record_to_insert = new stdClass();
-//    $record_to_insert->newsimage = $fromform->newsimage;
-//    $record_to_insert->timecreated = time();
-//
-//    try {
-//        $data = $DB->insert_record('s3coursedelete_awscreds', $record_to_insert, false);
-//
-//        insert_record_s3coursedelete_newsdetailurl($fromform);
-//
-//    } catch (dml_exception $e) {
-//        return false;
-//    }
-//
-//    // Go back to awscredsmanage.php page
-//    redirect($CFG->wwwroot . '/local/s3coursedelete/awscredsmanage.php', get_string('created_form', 'local_s3coursedelete'));
-//}
-//
-//if ($newsid) {
-//    // Add extra data to the form.
-//    global $DB;
-//    $manager = new manager();
-//    $message = $manager->get_message($newsid);
-//    if (!$message) {
-//        throw new invalid_parameter_exception('Message not found');
-//    }
-//    $mform->set_data($message);
-//}
+    $data = $DB->get_record('local_s3coursedelete', ['id' => 1]);
 
+    if (!$data) {
+        $record_to_insert = new stdClass();
+        $record_to_insert->accesskey = $fromform->accesskey;
+        $record_to_insert->secret_accesskey = $fromform->secretaccesskey;
+        $record_to_insert->region = $fromform->region;
+        $record_to_insert->version = $fromform->version;
+        $record_to_insert->bucketname = $fromform->bucketname;
+        $record_to_insert->timecreated = time();
+
+        $DB->insert_record('local_s3coursedelete', $record_to_insert);
+    } else {
+        $record_to_insert = new stdClass();
+        $record_to_insert->id = 1;
+        $record_to_insert->accesskey = $fromform->accesskey;
+        $record_to_insert->secret_accesskey = $fromform->secretaccesskey;
+        $record_to_insert->region = $fromform->region;
+        $record_to_insert->version = $fromform->version;
+        $record_to_insert->bucketname = $fromform->bucketname;
+        $record_to_insert->timecreated = time();
+
+        $DB->update_record('local_s3coursedelete', $record_to_insert);
+    }
+    redirect($CFG->wwwroot . '/admin/search.php#linkmodules', get_string('saved', 'local_s3coursedelete'));
+
+}
 echo $OUTPUT->header();
 $mform->display();
 echo $OUTPUT->footer();

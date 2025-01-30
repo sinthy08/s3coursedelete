@@ -24,4 +24,18 @@
  */
 
 $string['pluginname'] = 'Course Deletion';
+$string['accesskey'] = 'AWS Access Key';
+$string['secretaccesskey'] = 'AWS Secret Access Key';
+$string['region'] = 'Region';
+$string['version'] = 'Version';
+$string['service'] = 'Service';
+$string['bucketname'] = 'Bucket Name';
+$string['cancelled_form'] = 'Cancel';
+$string['saved'] = 'Saved';
+$string['addheader'] = 'AWS S3 Bucket Credentials';
+
+$string['noobject'] = 'No objects found in folder ';
+$string['deletion'] = 'Deleted ';
+$string['object'] = ' objects from folder ';
+$string['error'] = 'Error: ';
 

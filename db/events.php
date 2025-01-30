@@ -15,18 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Settings page for local_s3coursedelete.
- *
- * @package    local_s3coursedelete
- * @copyright  2023 Brain Station 23 Ltd.
+ * @category   external
+ * @copyright  2022 Brain Statin 23 LTD
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @since      Moodle 3.0
  */
 
-use local_aws\admin_settings_aws_region;
-defined('MOODLE_INTERNAL') || die;
+use local_s3coursedelete\observers;
 
-if ($hassiteconfig) {
-    $ADMIN->add('localplugins',
-        new admin_externalpage('local_s3coursedelete',get_string('pluginname','local_s3coursedelete'),
-            $CFG->wwwroot.'/local/s3coursedelete/awscreds.php'));
-}
+$observers = [
+    [
+        'eventname' => 'core\event\course_deleted',
+        'callback'  => '\local_s3coursedelete\event\observers::on_course_deleted',
+    ]
+];
